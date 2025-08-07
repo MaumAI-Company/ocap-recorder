@@ -98,17 +98,8 @@ cleanup() {
 
         # Force removal with better error handling
         rm -rf "$TEMP_DIR" 2>/dev/null || {
-            # If normal removal fails, try with sudo (if available)
-            if command -v sudo >/dev/null 2>&1; then
-                print_status "Trying cleanup with elevated permissions..."
-                sudo rm -rf "$TEMP_DIR" 2>/dev/null || {
-                    print_warning "Could not fully clean up temporary directory '$TEMP_DIR'."
-                    print_status "You can manually remove it with: sudo rm -rf '$TEMP_DIR'"
-                }
-            else
-                print_warning "Could not fully clean up temporary directory '$TEMP_DIR'."
-                print_status "You can manually remove it with: rm -rf '$TEMP_DIR' or sudo rm -rf '$TEMP_DIR'"
-            fi
+            print_warning "Could not fully clean up temporary directory '$TEMP_DIR'."
+            print_status "You can manually remove it with: rm -rf '$TEMP_DIR' or sudo rm -rf '$TEMP_DIR'"
         }
     fi
 }
