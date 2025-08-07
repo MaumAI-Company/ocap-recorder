@@ -1,0 +1,15 @@
+# Pulled Version Information
+# Generated on: Thu Aug  7 07:10:43 AM UTC 2025
+# Repository: https://github.com/open-world-agents/open-world-agents
+
+COMMIT_HASH=886a73897b4026a91b8b3c21dce844138518eec9
+BRANCH=main
+COMMIT_DATE=2025-08-07 16:02:00 +0900
+COMMIT_MESSAGE=Merge pull request #146 from open-world-agents/refactor/vpt-mp4-to-mkv-styling
+
+# Directories pulled:
+# - projects/ocap
+# - scripts/release
+
+# To reproduce this exact pull:
+# ./pull.sh main 886a73897b4026a91b8b3c21dce844138518eec9
