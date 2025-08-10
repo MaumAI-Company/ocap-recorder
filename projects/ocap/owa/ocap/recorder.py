@@ -3,6 +3,7 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 from queue import Empty, Queue
+from threading import Event
 from typing import Optional
 
 import typer
@@ -17,9 +18,15 @@ from owa.core.time import TimeUnits
 logger.remove()
 # how to use loguru with tqdm: https://github.com/Delgan/loguru/issues/135
 logger.add(lambda msg: tqdm.write(msg, end=""), filter={"owa.ocap": "DEBUG", "owa.env.gst": "INFO"}, colorize=True)
+# Add file logging
+logger.add(
+    "ocap_recording_{time:YYYY-MM-DD_HH-mm-ss}.log",
+    filter={"owa.ocap": "DEBUG", "owa.env.gst": "INFO"},
+)
 
 event_queue = Queue()
 MCAP_LOCATION = None
+stop_recording_event = Event()
 
 
 def _collect_environment_metadata() -> dict:
@@ -29,11 +36,39 @@ def _collect_environment_metadata() -> dict:
         by_alias=True
     )
     metadata["keyboard_repeat_timing"] = CALLABLES["desktop/keyboard.get_keyboard_repeat_timing"](return_seconds=False)
+    
+    # Record OS version
+    try:
+        import platform
+
+        os_version = platform.platform()
+        metadata["os_version"] = {"os_version": os_version}
+    except Exception as e:
+        logger.warning(f"Failed to record OS version: {e}")
+
+    # Record Display Configuration
+    try:
+        import win32api
+        import win32con
+
+        # TODO: get multiple monitors
+        devmode = win32api.EnumDisplaySettings(None, win32con.ENUM_CURRENT_SETTINGS)  # only primary monitor
+
+        metadata["display_config"]= {
+            "width": devmode.PelsWidth,
+            "height": devmode.PelsHeight,
+            "resolution": f"{devmode.PelsWidth}x{devmode.PelsHeight}",
+            "refresh_rate": devmode.DisplayFrequency,
+        }
+    except Exception as e:
+        logger.warning(f"Failed to record display configuration: {e}")
+
     return metadata
 
 
 def _record_environment_metadata(writer: OWAMcapWriter) -> None:
     """Record environment configuration as MCAP metadata."""
+    metadata = None
     try:
         metadata = _collect_environment_metadata()
         for name, data in metadata.items():
@@ -41,6 +76,13 @@ def _record_environment_metadata(writer: OWAMcapWriter) -> None:
             writer.write_metadata(name, data)
     except Exception as e:
         logger.warning(f"Failed to record environment metadata: {e}")
+    
+    if metadata:
+        logger.debug(f"Recorded metadata {metadata}")
+        _check_environment_metadata(metadata)
+    else:
+        logger.error("Failed to record environment metadata. Stopping.")
+        raise Exception("Failed to record environment metadata")
 
     # TODO: Add more environment metadata here:
     # - System information (OS version, hardware specs)
@@ -49,6 +91,67 @@ def _record_environment_metadata(writer: OWAMcapWriter) -> None:
     # - Input device configuration (keyboard layout, mouse settings)
     # - Game/application specific settings
 
+def _check_environment_metadata(metadata: dict) -> None:
+    """Check if the environment metadata is within expected ranges."""
+    
+    accepted_resolutions = {
+        (1920, 1080): "1080p",
+        (2560, 1440): "1440p",
+        # (3840, 2160): "4K",
+    }
+
+    metadata_display = metadata["display_config"]
+    # Check if monitor is not 1080p or 1440p
+    width, height = metadata_display["width"], metadata_display["height"]
+    
+    if (width, height) not in accepted_resolutions:
+        logger.error(
+            f"Non-standard resolution detected: {width}x{height}. "
+            f"{accepted_resolutions=}"
+        )
+        raise Exception(f"Non-standard resolution detected: {width}x{height}")
+    else:
+        resolution_name = accepted_resolutions[(width, height)]
+        logger.debug(f"Standard resolution detected: {width}x{height} ({resolution_name})")
+
+    x_rows = [
+        "00 00 00 00 00 00 00 00",
+        "15 6E 00 00 00 00 00 00",
+        "00 40 01 00 00 00 00 00",
+        "29 DC 03 00 00 00 00 00",
+        "00 00 28 00 00 00 00 00",
+    ]
+    x_hex = "".join(r.replace(" ", "").lower() for r in x_rows)
+    
+    y_rows = [
+        "00 00 00 00 00 00 00 00",
+        "FD 11 01 00 00 00 00 00",
+        "00 24 04 00 00 00 00 00",
+        "00 FC 12 00 00 00 00 00",
+        "00 C0 BB 01 00 00 00 00",
+    ]
+    y_hex = "".join(r.replace(" ", "").lower() for r in y_rows)
+
+    mouse_defaults = {
+        "SmoothMouseXCurve": x_hex,
+        "SmoothMouseYCurve": y_hex,
+        "MouseSpeed": 1,
+        "MouseSensitivity": 10,
+    }
+
+    metadata_mouse = metadata["pointer_ballistics_config"]
+    logger.debug(f"Mouse settings: {metadata_mouse}")
+
+    # Check if mouse settings are not default
+    non_default_settings = {}
+    for key, value in metadata_mouse.items():
+        if key in mouse_defaults:
+            if value != mouse_defaults[key]:
+                non_default_settings[key] = f"{value} (default: {mouse_defaults[key]})"
+
+    if non_default_settings:
+        logger.error(f"Non-default mouse settings detected: {non_default_settings}")
+        raise Exception(f"Non-default mouse settings detected: {non_default_settings}")
 
 def check_resources_health(resources):
     """Check if all resources are healthy. Returns list of unhealthy resource names."""
@@ -86,6 +189,12 @@ def enqueue_event(event, *, topic):
 
 
 def keyboard_monitor_callback(event):
+    # F9 key detection for immediate stop
+    if event.vk == 0x78 and event.event_type == "press":  # F9 key
+        logger.info("F9 key pressed - stopping recording...")
+        stop_recording_event.set()
+        return
+
     # info only for F1-F12 keys
     if 0x70 <= event.vk <= 0x7B and event.event_type == "press":
         logger.info(f"F1-F12 key pressed: F{event.vk - 0x70 + 1}")
@@ -218,11 +327,11 @@ def ensure_output_files_ready(file_location: Path):
 
 def record(
     file_location: Annotated[
-        Path,
+        Optional[Path],
         typer.Argument(
-            help="The location of the output file. If `output.mcap` is given as argument, the output file would be `output.mcap` and `output.mkv`."
+            help="The location of the output file. If not provided, a filename will be generated based on window name and timestamp. If `output.mcap` is given as argument, the output file would be `output.mcap` and `output.mkv`."
         ),
-    ],
+    ] = None,
     *,
     record_audio: Annotated[bool, typer.Option(help="Whether to record audio")] = True,
     record_video: Annotated[bool, typer.Option(help="Whether to record video")] = True,
@@ -261,7 +370,20 @@ def record(
     ] = 5.0,
 ):
     """Record screen, keyboard, mouse, and window events to an `.mcap` and `.mkv` file."""
-    global MCAP_LOCATION
+    global MCAP_LOCATION, stop_recording_event
+    stop_recording_event.clear()  # Reset the stop event
+
+    # Generate filename if not provided
+    if file_location is None:
+        import uuid
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        window_part = f"{window_name.replace(' ', '_')}" if window_name else ""
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f"recording_{timestamp}_{window_part}_{unique_id}.mcap"
+        file_location = Path(filename)
+
     output_file = ensure_output_files_ready(file_location)
     MCAP_LOCATION = output_file
 
@@ -278,6 +400,7 @@ def record(
     additional_properties = parse_additional_properties(additional_args)
 
     logger.info(USER_INSTRUCTION)
+    logger.info("Press F9 to stop recording at any time.")
 
     # Handle delayed start
     if start_after:
@@ -308,6 +431,11 @@ def record(
 
             try:
                 while True:
+                    # Check if F9 stop was triggered
+                    if stop_recording_event.is_set():
+                        logger.info("Recording stopped by user.")
+                        break
+
                     # Check if auto-stop time has been reached
                     if stop_after and (time.time() - recording_start_time) >= stop_after:
                         logger.info("⏰ Auto-stop time reached - stopping recording...")
@@ -355,7 +483,10 @@ def main():
     if not os.getenv("GITHUB_ACTIONS"):
         from owa.cli.utils import check_for_update
 
-        check_for_update("ocap", silent=False)
+        up_to_date = check_for_update("ocap", silent=False)
+        if not up_to_date:
+            logger.error("❌ Please update before running the recorder.")
+            return
     typer.run(record)
 
 
