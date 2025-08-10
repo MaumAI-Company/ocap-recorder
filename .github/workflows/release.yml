@@ -66,16 +66,17 @@ jobs:
           # Create Grand Theft Auto V version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-mcap-GTA.bat"
 
+          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
+
           # Read the content and replace the line in the Euro version
           $content = Get-Content "scripts/release/ocap/run-mcap-Euro.bat" -Raw
-          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
-          $newLineEuro = '@REM start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Euro Truck Simulator 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Euro Truck Simulator 2" --exact'
+          $newLineEuro = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Euro Truck Simulator 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Euro Truck Simulator 2" --exact'
           $content = $content -replace [regex]::Escape($oldLine), $newLineEuro
           Set-Content "scripts/release/ocap/run-mcap-Euro.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the GTA version
           $content = Get-Content "scripts/release/ocap/run-mcap-GTA.bat" -Raw
-          $newLineGTA = '@REM start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Grand Theft Auto V" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Grand Theft Auto V" --exact'
+          $newLineGTA = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Grand Theft Auto V" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Grand Theft Auto V" --exact'
           $content = $content -replace [regex]::Escape($oldLine), $newLineGTA
           Set-Content "scripts/release/ocap/run-mcap-GTA.bat" -Value $content -NoNewline
 
