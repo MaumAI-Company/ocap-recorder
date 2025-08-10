@@ -54,11 +54,58 @@ jobs:
       - name: Test whether ocap works well
         run: ocap --help
 
-      - name: Upload Release Files
+      - name: Create Multiple Versions of run.bat
+        shell: pwsh
+        run: |
+          # Create original version (default)
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-original.bat"
+
+          # Create Euro Truck Simulator 2 version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-mcap-Euro.bat"
+
+          # Create Grand Theft Auto V version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-mcap-GTA.bat"
+
+          # Read the content and replace the line in the Euro version
+          $content = Get-Content "scripts/release/ocap/run-mcap-Euro.bat" -Raw
+          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
+          $newLineEuro = '@REM start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Euro Truck Simulator 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Euro Truck Simulator 2" --exact'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineEuro
+          Set-Content "scripts/release/ocap/run-mcap-Euro.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the GTA version
+          $content = Get-Content "scripts/release/ocap/run-mcap-GTA.bat" -Raw
+          $newLineGTA = '@REM start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Grand Theft Auto V" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Grand Theft Auto V" --exact'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineGTA
+          Set-Content "scripts/release/ocap/run-mcap-GTA.bat" -Value $content -NoNewline
+
+          Write-Host "Created multiple versions of run.bat"
+          Write-Host "Files created:"
+          Get-ChildItem "scripts/release/ocap/run*.bat" | Format-Table Name, Length
+
+      - name: Upload Original Release Files
         uses: actions/upload-artifact@v4
         with:
           name: ocap
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Euro Truck Simulator Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-mcap-Euro
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-mcap-Euro.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Grand Theft Auto V Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-mcap-GTA
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-mcap-GTA.bat
             scripts/release/ocap/restore_ocap.py
