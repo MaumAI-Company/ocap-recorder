@@ -11,11 +11,6 @@ dependencies = [
     "owa-env-gst==0.5.6",
 ]
 
-[tool.uv.sources]
-owa-cli = { path = "../owa-cli", editable = true }
-owa-env-gst = { path = "../owa-env-gst", editable = true }
-owa-env-desktop = { path = "../owa-env-desktop", editable = true }
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
