@@ -66,6 +66,15 @@ jobs:
           # Create Grand Theft Auto V version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-GTA.bat"
 
+          # Create Counter-Strike 2 version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-CS2.bat"
+
+          # Create Valorant version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Valorant.bat"
+
+          # Create Minecraft version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Minecraft.bat"
+
           $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
 
           # Read the content and replace the line in the Euro version
@@ -79,6 +88,24 @@ jobs:
           $newLineGTA = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Grand Theft Auto V" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Grand Theft Auto V" --exact'
           $content = $content -replace [regex]::Escape($oldLine), $newLineGTA
           Set-Content "scripts/release/ocap/run-GTA.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the Counter-Strike 2 version
+          $content = Get-Content "scripts/release/ocap/run-CS2.bat" -Raw
+          $newLineCS2 = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Counter-Strike 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Counter-Strike 2" --exact'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineCS2
+          Set-Content "scripts/release/ocap/run-CS2.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the Valorant version
+          $content = Get-Content "scripts/release/ocap/run-Valorant.bat" -Raw
+          $newLineValorant = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "VALORANT" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "VALORANT" --exact'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineValorant
+          Set-Content "scripts/release/ocap/run-Valorant.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the Minecraft version
+          $content = Get-Content "scripts/release/ocap/run-Minecraft.bat" -Raw
+          $newLineMinecraft = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Minecraft" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Minecraft" --exact'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineMinecraft
+          Set-Content "scripts/release/ocap/run-Minecraft.bat" -Value $content -NoNewline
 
           Write-Host "Created multiple versions of run.bat"
           Write-Host "Files created:"
@@ -96,7 +123,7 @@ jobs:
       - name: Upload Euro Truck Simulator Version
         uses: actions/upload-artifact@v4
         with:
-          name: ocap-mcap-Euro
+          name: ocap-Euro
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run-Euro.bat
@@ -105,7 +132,7 @@ jobs:
       - name: Upload Grand Theft Auto V Version
         uses: actions/upload-artifact@v4
         with:
-          name: ocap-mcap-GTA
+          name: ocap-GTA
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run-GTA.bat
