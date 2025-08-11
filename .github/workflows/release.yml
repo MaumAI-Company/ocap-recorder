@@ -137,3 +137,30 @@ jobs:
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run-GTA.bat
             scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Counter-Strike 2 Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-CS2
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-CS2.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Valorant Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-Valorant
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-Valorant.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Minecraft Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-Minecraft
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-Minecraft.bat
+            scripts/release/ocap/restore_ocap.py
