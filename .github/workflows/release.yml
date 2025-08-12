@@ -70,10 +70,10 @@ jobs:
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-CS2.bat"
 
           # Create Valorant version
-          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Valorant.bat"
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Valo.bat"
 
           # Create Minecraft version
-          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Minecraft.bat"
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Mine.bat"
 
           $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
 
