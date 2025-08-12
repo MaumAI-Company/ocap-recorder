@@ -75,35 +75,35 @@ jobs:
           # Create Minecraft version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Minecraft.bat"
 
-          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
+          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title    Conda Environment (%ENV_DIR%)"'
 
           # Read the content and replace the line in the Euro version
           $content = Get-Content "scripts/release/ocap/run-Euro.bat" -Raw
-          $newLineEuro = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Euro Truck Simulator 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Euro Truck Simulator 2" --exact'
+          $newLineEuro = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Euro Truck Simulator 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Euro Truck Simulator 2"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineEuro
           Set-Content "scripts/release/ocap/run-Euro.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the GTA version
           $content = Get-Content "scripts/release/ocap/run-GTA.bat" -Raw
-          $newLineGTA = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Grand Theft Auto V" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Grand Theft Auto V" --exact'
+          $newLineGTA = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Grand Theft Auto V" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Grand Theft Auto V"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineGTA
           Set-Content "scripts/release/ocap/run-GTA.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the Counter-Strike 2 version
           $content = Get-Content "scripts/release/ocap/run-CS2.bat" -Raw
-          $newLineCS2 = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Counter-Strike 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Counter-Strike 2" --exact'
+          $newLineCS2 = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Counter-Strike 2" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Counter-Strike 2"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineCS2
           Set-Content "scripts/release/ocap/run-CS2.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the Valorant version
           $content = Get-Content "scripts/release/ocap/run-Valorant.bat" -Raw
-          $newLineValorant = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "VALORANT" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "VALORANT" --exact'
+          $newLineValorant = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "VALORANT" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "VALORANT"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineValorant
           Set-Content "scripts/release/ocap/run-Valorant.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the Minecraft version
           $content = Get-Content "scripts/release/ocap/run-Minecraft.bat" -Raw
-          $newLineMinecraft = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title Conda Environment (%ENV_DIR%) ^&^& ocap --window-name "Minecraft" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Minecraft" --exact'
+          $newLineMinecraft = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Minecraft" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Minecraft"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineMinecraft
           Set-Content "scripts/release/ocap/run-Minecraft.bat" -Value $content -NoNewline
 
