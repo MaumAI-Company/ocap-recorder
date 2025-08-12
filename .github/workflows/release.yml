@@ -96,16 +96,16 @@ jobs:
           Set-Content "scripts/release/ocap/run-CS2.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the Valorant version
-          $content = Get-Content "scripts/release/ocap/run-Valorant.bat" -Raw
+          $content = Get-Content "scripts/release/ocap/run-Valo.bat" -Raw
           $newLineValorant = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "VALORANT" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "VALORANT"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineValorant
-          Set-Content "scripts/release/ocap/run-Valorant.bat" -Value $content -NoNewline
+          Set-Content "scripts/release/ocap/run-Valo.bat" -Value $content -NoNewline
 
           # Read the content and replace the line in the Minecraft version
-          $content = Get-Content "scripts/release/ocap/run-Minecraft.bat" -Raw
+          $content = Get-Content "scripts/release/ocap/run-Mine.bat" -Raw
           $newLineMinecraft = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Minecraft" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Minecraft"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineMinecraft
-          Set-Content "scripts/release/ocap/run-Minecraft.bat" -Value $content -NoNewline
+          Set-Content "scripts/release/ocap/run-Mine.bat" -Value $content -NoNewline
 
           Write-Host "Created multiple versions of run.bat"
           Write-Host "Files created:"
@@ -150,17 +150,17 @@ jobs:
       - name: Upload Valorant Version
         uses: actions/upload-artifact@v4
         with:
-          name: ocap-Valorant
+          name: ocap-Valo
           path: |
             scripts/release/ocap/env.tar.gz
-            scripts/release/ocap/run-Valorant.bat
+            scripts/release/ocap/run-Valo.bat
             scripts/release/ocap/restore_ocap.py
 
       - name: Upload Minecraft Version
         uses: actions/upload-artifact@v4
         with:
-          name: ocap-Minecraft
+          name: ocap-Mine
           path: |
             scripts/release/ocap/env.tar.gz
-            scripts/release/ocap/run-Minecraft.bat
+            scripts/release/ocap/run-Mine.bat
             scripts/release/ocap/restore_ocap.py
