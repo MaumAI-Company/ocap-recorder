@@ -75,7 +75,7 @@ jobs:
           # Create Minecraft version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Minecraft.bat"
 
-          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title    Conda Environment (%ENV_DIR%)"'
+          $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
 
           # Read the content and replace the line in the Euro version
           $content = Get-Content "scripts/release/ocap/run-Euro.bat" -Raw
