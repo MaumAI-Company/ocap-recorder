@@ -62,6 +62,14 @@ exit /b 0
             pause
             exit /b 1
         )
+
+        :: Rename soup-3.0-0.dll to disable it
+        if exist ".\Library\bin\soup-3.0-0.dll" (
+            echo Disabling soup-3.0-0.dll...
+            ren ".\Library\bin\soup-3.0-0.dll" "soup-3.0-0.dll.disabled" || (
+                echo [WARNING] Failed to rename soup-3.0-0.dll
+            )
+        )
     ) else (
         echo conda-unpack.exe not found, skipping this step.
     )
