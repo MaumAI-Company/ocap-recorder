@@ -97,7 +97,7 @@ jobs:
 
           # Read the content and replace the line in the Valorant version
           $content = Get-Content "scripts/release/ocap/run-Valo.bat" -Raw
-          $newLineValorant = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "VALORANT" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "VALORANT"'
+          $newLineValorant = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "VALORANT" --start-after 10.0 ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "VALORANT"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineValorant
           Set-Content "scripts/release/ocap/run-Valo.bat" -Value $content -NoNewline
 
