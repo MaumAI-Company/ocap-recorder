@@ -78,6 +78,9 @@ jobs:
           # Create Apex Legends version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-Apex.bat"
 
+          # Create Rainbow Six version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-R6.bat"
+
           $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
 
           # Read the content and replace the line in the Euro version
@@ -115,6 +118,12 @@ jobs:
           $newLineApex = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Apex Legends" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Apex Legends"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineApex
           Set-Content "scripts/release/ocap/run-Apex.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the Rainbow Six version
+          $content = Get-Content "scripts/release/ocap/run-R6.bat" -Raw
+          $newLineR6 = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Rainbow Six" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Rainbow Six"'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineR6
+          Set-Content "scripts/release/ocap/run-R6.bat" -Value $content -NoNewline
 
           Write-Host "Created multiple versions of run.bat"
           Write-Host "Files created:"
@@ -181,4 +190,13 @@ jobs:
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run-Apex.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Rainbow Six Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-R6
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-R6.bat
             scripts/release/ocap/restore_ocap.py
