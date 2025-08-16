@@ -81,6 +81,9 @@ jobs:
           # Create Rainbow Six version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-R6.bat"
 
+          # Create PUBG version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run_battlegrounds.bat"
+
           $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
 
           # Read the content and replace the line in the Euro version
@@ -124,6 +127,12 @@ jobs:
           $newLineR6 = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Rainbow Six" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Rainbow Six"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineR6
           Set-Content "scripts/release/ocap/run-R6.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the PUBG version
+          $content = Get-Content "scripts/release/ocap/run_battlegrounds.bat" -Raw
+          $newLinePUBG = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "PUBG" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "PUBG"'
+          $content = $content -replace [regex]::Escape($oldLine), $newLinePUBG
+          Set-Content "scripts/release/ocap/run_battlegrounds.bat" -Value $content -NoNewline
 
           Write-Host "Created multiple versions of run.bat"
           Write-Host "Files created:"
@@ -199,4 +208,13 @@ jobs:
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run-R6.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload PUBG Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-PUBG
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run_battlegrounds.bat
             scripts/release/ocap/restore_ocap.py
