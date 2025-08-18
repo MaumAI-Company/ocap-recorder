@@ -222,7 +222,7 @@ jobs:
       - name: Upload PUBG Version
         uses: actions/upload-artifact@v4
         with:
-          name: ocap-PUBG
+          name: ocap-Battlegrounds
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run_battlegrounds.bat
