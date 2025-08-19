@@ -1,13 +1,13 @@
 # Pulled Version Information
-# Generated on: Mon Aug 11 02:41:10 PM UTC 2025
+# Generated on: Tue Aug 19 09:09:03 AM UTC 2025
 # Repository: https://github.com/open-world-agents/open-world-agents
-# Pull timestamp: 2025-08-11T14:41:10Z
+# Pull timestamp: 2025-08-19T09:09:03Z
 
-COMMIT_HASH=8ddf50d1f11de7c2ba37163b913331a6221c63f3
+COMMIT_HASH=bea7301a19b5bad474c172b140489bedceb8d72a
 BRANCH=
-COMMIT_DATE=2025-08-06 00:05:06 +0900
-COMMIT_MESSAGE=v0.5.6
-RELEASE_TAG=v0.5.6
+COMMIT_DATE=2025-08-19 04:58:25 +0000
+COMMIT_MESSAGE=v0.5.7
+RELEASE_TAG=v0.5.7
 PULL_MODE=latest_release
 
 # Directories pulled:
@@ -15,6 +15,6 @@ PULL_MODE=latest_release
 # - scripts/release
 
 # To reproduce this exact pull:
-# ./pull.sh v0.5.6
+# ./pull.sh v0.5.7
 # or
-# ./pull.sh  8ddf50d1f11de7c2ba37163b913331a6221c63f3
+# ./pull.sh  bea7301a19b5bad474c172b140489bedceb8d72a
