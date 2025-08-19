@@ -87,6 +87,9 @@ jobs:
           # Create Cyberpunk 2077 version
           Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run_Cyber.bat"
 
+          # Create Stardew Valley version
+          Copy-Item "scripts/release/ocap/run.bat" "scripts/release/ocap/run-SDV.bat"
+
           $oldLine = 'start cmd.exe /k "call .\env\Scripts\activate.bat && title Conda Environment (%ENV_DIR%)"'
 
           # Read the content and replace the line in the Euro version
@@ -142,6 +145,12 @@ jobs:
           $newLineCyber = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Cyberpunk 2077" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Cyberpunk 2077"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineCyber
           Set-Content "scripts/release/ocap/run_Cyber.bat" -Value $content -NoNewline
+
+          # Read the content and replace the line in the Stardew Valley version
+          $content = Get-Content "scripts/release/ocap/run-SDV.bat" -Raw
+          $newLineSDV = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Stardew Valley" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Stardew Valley"'
+          $content = $content -replace [regex]::Escape($oldLine), $newLineSDV
+          Set-Content "scripts/release/ocap/run-SDV.bat" -Value $content -NoNewline
 
           Write-Host "Created multiple versions of run.bat"
           Write-Host "Files created:"
@@ -235,4 +244,13 @@ jobs:
           path: |
             scripts/release/ocap/env.tar.gz
             scripts/release/ocap/run_Cyber.bat
+            scripts/release/ocap/restore_ocap.py
+
+      - name: Upload Stardew Valley Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocap-SDV
+          path: |
+            scripts/release/ocap/env.tar.gz
+            scripts/release/ocap/run-SDV.bat
             scripts/release/ocap/restore_ocap.py
