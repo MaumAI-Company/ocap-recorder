@@ -118,7 +118,7 @@ jobs:
 
           # Read the content and replace the line in the Minecraft version
           $content = Get-Content "scripts/release/ocap/run-Mine.bat" -Raw
-          $newLineMinecraft = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Minecraft" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Minecraft"'
+          $newLineMinecraft = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Minecraft"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineMinecraft
           Set-Content "scripts/release/ocap/run-Mine.bat" -Value $content -NoNewline
 
@@ -148,7 +148,7 @@ jobs:
 
           # Read the content and replace the line in the Stardew Valley version
           $content = Get-Content "scripts/release/ocap/run-SDV.bat" -Raw
-          $newLineSDV = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap --window-name "Stardew Valley" ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Stardew Valley"'
+          $newLineSDV = 'start "" cmd.exe /c call .\env\Scripts\activate.bat ^&^& title    ^&^& ocap ^& owl mcap sanitize *.mcap --yes --no-backups --max-removal-ratio 1.0 --keep-window "Stardew Valley"'
           $content = $content -replace [regex]::Escape($oldLine), $newLineSDV
           Set-Content "scripts/release/ocap/run-SDV.bat" -Value $content -NoNewline
 
