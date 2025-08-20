@@ -1,36 +1,17 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Get the directory where this script is located
-set "SCRIPT_DIR=%~dp0"
-:: Remove trailing backslash if present
-if "%SCRIPT_DIR:~-1%"=="\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
-
-:: Change to script directory to ensure relative paths work correctly
-pushd "%SCRIPT_DIR%" || (
-    echo [ERROR] Failed to change to script directory: %SCRIPT_DIR%
-    pause
-    exit /b 1
-)
-
 :: Configuration
 set ENV_DIR=env
 set TAR_FILE=env.tar.gz
 
 :: Initialize environment
-call :InitializeEnvironment || (
-    popd
-    exit /b 1
-)
+call :InitializeEnvironment || exit /b 1
 
 :: Run the application with auto-detection
-call :RunApplication %* || (
-    popd
-    exit /b 1
-)
+call :RunApplication %* || exit /b 1
 
 echo Script execution completed.
-popd
 exit /b 0
 
 :: ========= FUNCTIONS =========
@@ -45,7 +26,7 @@ exit /b 0
             exit /b 1
         )
 
-        tar -xf "%TAR_FILE%" -C "%ENV_DIR%" || (
+        tar -xf %TAR_FILE% -C %ENV_DIR% || (
             echo [ERROR] Failed to extract %TAR_FILE%
             pause
             exit /b 1
@@ -54,11 +35,8 @@ exit /b 0
         echo %ENV_DIR% directory already exists. Skipping extraction.
     )
 
-    :: Store current directory before entering env directory
-    set "ORIGINAL_DIR=%CD%"
-
-    :: Enter environment directory using absolute path
-    pushd "%SCRIPT_DIR%\%ENV_DIR%" || (
+    :: Enter environment directory
+    cd "%ENV_DIR%" || (
         echo [ERROR] Failed to enter %ENV_DIR% directory
         pause
         exit /b 1
@@ -67,9 +45,8 @@ exit /b 0
     :: Activate virtual environment if needed
     if "%CONDA_DEFAULT_ENV%"=="" (
         echo Activating virtual environment...
-        call ".\Scripts\activate.bat" || (
+        call .\Scripts\activate.bat || (
             echo [ERROR] Failed to activate environment
-            popd
             pause
             exit /b 1
         )
@@ -80,9 +57,8 @@ exit /b 0
     :: Run conda-unpack if available
     if exist ".\Scripts\conda-unpack.exe" (
         echo Running conda-unpack.exe...
-        call ".\Scripts\conda-unpack.exe" || (
+        call .\Scripts\conda-unpack.exe || (
             echo [ERROR] Failed to run conda-unpack.exe
-            popd
             pause
             exit /b 1
         )
@@ -98,14 +74,12 @@ exit /b 0
         echo conda-unpack.exe not found, skipping this step.
     )
 
-    :: Return to script directory
-    popd
+    :: Return to original directory
+    cd ..
 
-    :: Restore `ocap` command using absolute path
+    :: Restore `ocap` command
     echo Restoring `ocap` command...
-    python "%SCRIPT_DIR%\restore_ocap.py" || (
-        echo [WARNING] Failed to restore ocap command, but continuing...
-    )
+    python restore_ocap.py
 
     exit /b 0
 
